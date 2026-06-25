@@ -1,0 +1,9 @@
+{
+  "name": "Conferencia de Notas",
+  "short_name": "Conferencia",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f4ef",
+  "theme_color": "#164f45",
+  "icons": []
+}
