@@ -1,9 +1,10 @@
-const CACHE_NAME = "conferencia-notas-v5";
+const CACHE_NAME = "conferencia-notas-v7";
 const FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./scanner-zxing.js",
   "./manifest.webmanifest"
 ];
 
