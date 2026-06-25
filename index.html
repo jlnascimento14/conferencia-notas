@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#164f45">
+    <title>Conferencia de Notas</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Conferencia por grupo</p>
+          <h1>Notas na mesma caixa</h1>
+        </div>
+        <button class="icon-button" id="installButton" hidden title="Instalar app" aria-label="Instalar app">
+          <span aria-hidden="true">+</span>
+        </button>
+      </header>
+
+      <main>
+        <section class="panel active" id="setupView" aria-labelledby="setupTitle">
+          <div class="section-header">
+            <div>
+              <h2 id="setupTitle">Montar grupo</h2>
+              <p>Leia ou digite as notas que chegaram juntas.</p>
+            </div>
+            <button class="secondary" id="newGroupButton">Novo grupo</button>
+          </div>
+
+          <form class="scan-form" id="invoiceForm">
+            <label for="invoiceCode">Nota fiscal</label>
+            <div class="input-row">
+              <input id="invoiceCode" autocomplete="off" inputmode="numeric" placeholder="Chave ou numero da NF">
+              <button type="button" class="icon-button" id="scanInvoiceButton" title="Ler pela camera" aria-label="Ler nota pela camera">
+                <span aria-hidden="true">[]</span>
+              </button>
+            </div>
+            <button type="submit" class="primary">Adicionar nota</button>
+          </form>
+
+          <form class="xml-form" id="xmlForm">
+            <div class="section-header compact">
+              <div>
+                <h3>Importar XML da NF-e</h3>
+                <p>Use o arquivo XML recebido com a nota para trazer os itens automaticamente.</p>
+              </div>
+            </div>
+            <label for="xmlFiles">Arquivos XML</label>
+            <input id="xmlFiles" type="file" accept=".xml,text/xml,application/xml" multiple>
+            <button type="submit" class="primary">Importar XML</button>
+          </form>
+
+          <div class="list-block">
+            <div class="list-title">
+              <h3>Notas do grupo</h3>
+              <span id="invoiceCount">0 notas</span>
+            </div>
+            <div class="empty-state" id="emptyInvoices">Nenhuma nota adicionada.</div>
+            <div class="invoice-list" id="invoiceList"></div>
+          </div>
+
+          <form class="item-form" id="itemForm">
+            <div class="section-header compact">
+              <div>
+                <h3>Itens esperados</h3>
+                <p>Escolha a nota e cadastre os produtos dela.</p>
+              </div>
+            </div>
+            <label for="invoiceSelect">Nota</label>
+            <select id="invoiceSelect"></select>
+
+            <label for="itemCode">Codigo do produto</label>
+            <input id="itemCode" autocomplete="off" placeholder="Codigo ou codigo de barras">
+
+            <label for="itemName">Descricao</label>
+            <input id="itemName" autocomplete="off" placeholder="Nome do produto">
+
+            <label for="itemQuantity">Quantidade</label>
+            <input id="itemQuantity" type="number" min="1" step="1" value="1">
+
+            <button type="submit" class="primary">Adicionar item</button>
+          </form>
+
+          <details class="bulk-import">
+            <summary>Colar varios itens</summary>
+            <p>Use uma linha por item: codigo;descricao;quantidade</p>
+            <textarea id="bulkItems" rows="5" placeholder="789100000001;Produto A;3&#10;789100000002;Produto B;1"></textarea>
+            <button type="button" class="secondary" id="bulkImportButton">Importar para a nota escolhida</button>
+          </details>
+
+          <button class="start-button" id="startConferenceButton">Iniciar conferencia do grupo</button>
+        </section>
+
+        <section class="panel" id="conferenceView" aria-labelledby="conferenceTitle">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow" id="groupLabel">Grupo atual</p>
+              <h2 id="conferenceTitle">Conferir produtos</h2>
+            </div>
+            <button class="secondary" id="backButton">Editar grupo</button>
+          </div>
+
+          <div class="stats">
+            <div>
+              <strong id="doneCount">0</strong>
+              <span>conferidos</span>
+            </div>
+            <div>
+              <strong id="pendingCount">0</strong>
+              <span>faltantes</span>
+            </div>
+            <div>
+              <strong id="errorCount">0</strong>
+              <span>divergencias</span>
+            </div>
+          </div>
+
+          <form class="scan-form" id="productForm">
+            <label for="productCode">Produto recebido</label>
+            <div class="input-row">
+              <input id="productCode" autocomplete="off" placeholder="Codigo do produto">
+              <button type="button" class="icon-button" id="scanProductButton" title="Ler pela camera" aria-label="Ler produto pela camera">
+                <span aria-hidden="true">[]</span>
+              </button>
+            </div>
+            <button type="submit" class="primary">Conferir produto</button>
+          </form>
+
+          <div class="result-box" id="lastResult" role="status" aria-live="polite">Aguardando leitura.</div>
+
+          <div class="list-block">
+            <div class="list-title">
+              <h3>Pendencias do grupo</h3>
+              <span id="pendingLabel">0 itens</span>
+            </div>
+            <div class="item-list" id="pendingList"></div>
+          </div>
+
+          <div class="list-block">
+            <div class="list-title">
+              <h3>Historico</h3>
+              <button class="text-button" id="clearHistoryButton" type="button">Limpar</button>
+            </div>
+            <div class="empty-state" id="emptyHistory">Nenhuma conferencia ainda.</div>
+            <div class="history-list" id="historyList"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="scannerDialog">
+      <form method="dialog" class="scanner-shell">
+        <div class="section-header compact">
+          <div>
+            <h2 id="scannerTitle">Leitura</h2>
+            <p id="scannerHelp">Aponte a camera para o codigo.</p>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Fechar camera">x</button>
+        </div>
+        <video id="scannerVideo" playsinline muted></video>
+        <p class="scanner-message" id="scannerMessage">Abrindo camera...</p>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
